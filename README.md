@@ -1,2 +1,2 @@
-# Help-LLM
+# HeraMod
 A LLM designed to help people
