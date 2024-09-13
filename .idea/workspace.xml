@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fa97a9f-74ec-4d1b-8ee6-5830ac38a5b4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/HeraMod.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/HeraMod.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tokenizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/simpleDataset.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tokenizer.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +45,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.inline.completion",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -67,7 +67,8 @@
       <updated>1726044287865</updated>
       <workItem from="1726044289267" duration="661000" />
       <workItem from="1726059322660" duration="1249000" />
-      <workItem from="1726080716800" duration="2628000" />
+      <workItem from="1726080716800" duration="2684000" />
+      <workItem from="1726248263244" duration="1481000" />
     </task>
     <servers />
   </component>
