@@ -33,7 +33,7 @@ class GPT(torch.nn.Module):
         argument = token_embeddings + pos_embeddings
         argument = self.dropout_embedding(argument)
         argument = self.transformers(argument)
-        argument = self.final_norm(argument)
+        argument = self.final_normalization(argument)
 
         # Return logits from the calculated torch
         logits = self.output_head(argument)

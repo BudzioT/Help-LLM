@@ -40,7 +40,7 @@ class MultiHeadAttention(torch.nn.Module):
         # Split matrices to heads
         keys = keys.view(base, num_tokens, self.heads, self.head_dim)
         queries = queries.view(base, num_tokens, self.heads, self.head_dim)
-        values = self.W_value.view(base, num_tokens, self.heads, self.head_dim)
+        values = values.view(base, num_tokens, self.heads, self.head_dim)
 
         # Transpose matrices (swap dimensions: tokens with heads)
         keys = keys.transpose(1, 2)
