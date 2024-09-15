@@ -4,6 +4,19 @@ import torch
 from gpt import GPT
 
 
+def text_to_ids(text, tokenizer):
+    """Encode text into token IDs"""
+    encoded = tokenizer.encode(text)
+    encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+    return encoded_tensor
+
+
+def ids_to_text(ids, tokenizer):
+    """Decode IDs back to text"""
+    flat_tensor = ids.squeeze(0)
+    return tokenizer.decode(flat_tensor.tolist())
+
+
 def generate_simple_text(model, index, max_new_tokens, context_size):
     """Generate new words for the text"""
     for _ in range(max_new_tokens):
@@ -39,27 +52,25 @@ def main():
     }
 
     # Torch seed for randomness
-    torch.manual_seed(1)
+    torch.manual_seed(123)
     # Model of LLM
     model = GPT(GPT_CONFIG)
     # Disable dropout
     model.eval()
 
-    start_text = "Hello, I am "
+    start_text = "I will make you"
 
     # Create tokenizer, encode starter text and build a tensor out of it
     tokenizer = tiktoken.get_encoding("gpt2")
-    encoded = tokenizer.encode(start_text)
-    encoded_tensor = torch.tensor(encoded).unsqueeze(0)
 
     print("\nInput text:", start_text, "\n")
 
     # Generate the rest of text, decode it
-    output = generate_simple_text(model, encoded_tensor, 10, GPT_CONFIG["context_length"])
-    decoded_text = tokenizer.decode(output.squeeze(0).tolist())
+    output = generate_simple_text(model, text_to_ids(start_text, tokenizer),
+                                  10, GPT_CONFIG["context_length"])
 
     print("Output length:", len(output[0]))
-    print("Output text:", decoded_text)
+    print("Output text:", ids_to_text(output, tokenizer))
 
 
 # Run the main program
