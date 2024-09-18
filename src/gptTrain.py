@@ -100,7 +100,9 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
 
 
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
+    """Evaluate model to training mode"""
     model.eval()
+    # If there isn't any gradient, calculate the loss
     with torch.no_grad():
         train_loss = calc_loss_loader(train_loader, model, device, eval_iter)
         validation_loss = calc_loss_loader(validation_loader, model, device, eval_iter)
