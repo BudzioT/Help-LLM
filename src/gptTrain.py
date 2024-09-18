@@ -6,27 +6,6 @@ from utilities import *
 from data import create_dataloader
 
 
-def generate_simple_text(model, index, max_new_tokens, context_size):
-    """Generate new words for the text"""
-    for _ in range(max_new_tokens):
-        # Use only given amount of last tokens if current context size exceeds supported one
-        index_condition = index[:, -context_size:]
-
-        # Get predictions
-        with torch.no_grad():
-            logits = model(index_condition)
-
-        # Focus only on the last step
-        logits = logits[:, -1, :]
-
-        # Get index of vocabulary element with the hightest logits value
-        index_next = torch.argmax(logits, -1, True)
-        # Append it to the current sequence
-        index = torch.cat((index, index_next), dim=1)
-
-    return index
-
-
 def main():
     """Main function of GPT program"""
     ##############################################
@@ -87,6 +66,47 @@ def main():
                                           GPT_CONFIG["context_length"], GPT_CONFIG["context_length"],
                                           False, False, 0)
 
+
+def train_model(model, train_loader, validation_loader, optimizer, device, epochs,
+                eval_freq, eval_iter, input_text, tokenizer):
+    """Train the model on the given input text, with specified parameters"""
+    # List to track training parameters
+    train_losses, validation_losses, tokens_seen_tracker = [], [], []
+    tokens_seen, global_step = 0, -1
+
+    # Training loop
+    for epoch in range(epochs):
+        # Set model to training mode
+        model.train()
+
+        # Go through every batch set in the train loader
+        for input_batch, target_batch in train_loader:
+            optimizer.zero_grad() # Reset loss gradient from the previous batch
+            loss = calc_loss_batch(input_batch, target_batch, model, device)
+            # Calculate loss gradient and update weights using them
+            loss.backward()
+            optimizer.step()
+
+            # Update global step along with information about what tokens were seen
+            tokens_seen += input_batch.numel()
+            global_step += 1
+
+            if global_step % eval_freq == 0:
+                train_loss, validation_loss = evaluate_model(
+                    model, train_loader, validation_loader, device, eval_iter)
+                #######################################
+                # Finish this
+                #######################################
+
+
+def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
+    model.eval()
+    with torch.no_grad():
+        train_loss = calc_loss_loader(train_loader, model, device, eval_iter)
+        validation_loss = calc_loss_loader(validation_loader, model, device, eval_iter)
+    model.train()
+
+    return train_loss, validation_loss
 
 # Run the main program
 if __name__ == "__main__":
