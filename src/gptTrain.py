@@ -1,6 +1,5 @@
 import tiktoken
 import torch
-from SCons.Tool.sgiar import generate
 
 from gpt import GPT
 from utilities import *
@@ -113,25 +112,25 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
                 print(f"Epoch {epoch+1} ({global_step:06d}): "
                       f"Train loss {train_loss:.3f}, Validation loss: {train_loss:.3f}")
 
-            print_sample(model, tokenizer, device, input_text)
-            return train_losses, validation_losses, tokens_seen_tracker
+        print_sample(model, tokenizer, device, input_text)
+    return train_losses, validation_losses, tokens_seen_tracker
+
 
 def print_sample(model, tokenizer, device, input_text):
     """Generate and print sample"""
     # Evaluate model, calculate context size and encode the text
     model.eval()
-    context_size = model.pos_emb.weight.shape[0]
+    context_size = model.pos_embedding.weight.shape[0]
     encoded = text_to_ids(input_text, tokenizer).to(device)
 
     # If there isn't gradient existing, generate text
     with torch.no_grad():
         # Get token ids, decode them and print the resulting text
         token_ids = generate_text(model, encoded, 50, context_size)
-        decoded = ids_to_text(token_ids, tokenizer)
-        print(decoded.replace('\n', ' '))
+    decoded = ids_to_text(token_ids, tokenizer)
+    print(decoded.replace('\n', ' '))
     # Change back to training mode
     model.train()
-
 
 
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
@@ -144,6 +143,7 @@ def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
     model.train()
 
     return train_loss, validation_loss
+
 
 # Run the main program
 if __name__ == "__main__":

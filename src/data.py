@@ -18,7 +18,7 @@ class GPTDataset(Dataset):
             target_chunk = token_ids[i + 1: i + length + 1]
 
             self.input_ids.append(torch.tensor(input_chunk))
-            self.input_ids.append(torch.tensor(target_chunk))
+            self.target_ids.append(torch.tensor(target_chunk))
 
     def __len__(self):
         """Get length of dataset"""
