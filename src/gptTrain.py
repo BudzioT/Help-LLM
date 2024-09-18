@@ -1,5 +1,6 @@
 import tiktoken
 import torch
+import matplotlib.pyplot as plt
 
 from gpt import GPT
 from utilities import *
@@ -127,8 +128,8 @@ def print_sample(model, tokenizer, device, input_text):
     with torch.no_grad():
         # Get token ids, decode them and print the resulting text
         token_ids = generate_text(model, encoded, 50, context_size)
-    decoded = ids_to_text(token_ids, tokenizer)
-    print(decoded.replace('\n', ' '))
+        decoded = ids_to_text(token_ids, tokenizer)
+        print(decoded.replace('\n', ' '))
     # Change back to training mode
     model.train()
 
@@ -143,6 +144,26 @@ def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
     model.train()
 
     return train_loss, validation_loss
+
+
+def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
+    """Plot the losses"""
+    fig, axis1 = plt.subplots()
+
+    # Plot training and validations losses against epochs
+    axis1.plot(epochs_seen, train_losses, label="Training loss")
+    axis1.plot(epochs_seen, val_losses, linestyle="-.", label="Validation loss")
+    axis1.set_xlabel("Epochs")
+    axis1.set_ylabel("Loss")
+    axis1.legend(loc="upper right")
+
+    # Second X-Axis for tokens that were seen
+    axis2 = axis1.twiny()  # Copy first axis
+    axis2.plot(tokens_seen, train_losses, alpha=0)  # Add aligned ticks
+    axis2.set_xlabel("Tokens seen")
+
+    # Adjust layout
+    fig.tight_layout()
 
 
 # Run the main program
