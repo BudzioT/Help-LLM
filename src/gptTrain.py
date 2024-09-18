@@ -44,7 +44,8 @@ def main():
     # Create tokenizer, encode starter text and build a tensor out of it
     tokenizer = tiktoken.get_encoding("gpt2")
     # Create AdamW optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), 0.0004, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), TRAIN_SETTINGS["learning_rate"],
+                                  weight_decay=TRAIN_SETTINGS["weight_decay"])
 
     ##############################################
     # Load data
@@ -69,11 +70,12 @@ def main():
                                           GPT_CONFIG["context_length"], GPT_CONFIG["context_length"],
                                           False, False, 0)
 
-    # Test train
-    epochs = 10
+    # Begin the training
     train_losses, validation_losses, tokens_seen = train_model(
-        model, train_loader, validation_loader, optimizer, device, epochs,
-    5, 5, "Every effort moves you", tokenizer)
+        model, train_loader, validation_loader, optimizer, device, TRAIN_SETTINGS["epochs"],
+        5, 1, "Every effort moves you", tokenizer)
+
+    return train_losses, validation_losses, tokens_seen
 
 
 def train_model(model, train_loader, validation_loader, optimizer, device, epochs,
@@ -90,7 +92,7 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
 
         # Go through every batch set in the train loader
         for input_batch, target_batch in train_loader:
-            optimizer.zero_grad() # Reset loss gradient from the previous batch
+            optimizer.zero_grad()  # Reset loss gradient from the previous batch
             loss = calc_loss_batch(input_batch, target_batch, model, device)
             # Calculate loss gradient and update weights using them
             loss.backward()
@@ -110,7 +112,7 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
                 validation_losses.append(validation_loss)
                 tokens_seen_tracker.append(tokens_seen)
 
-                print(f"Epoch {epoch+1} ({global_step:06d}): "
+                print(f"Epoch {epoch + 1} ({global_step:06d}): "
                       f"Train loss {train_loss:.3f}, Validation loss: {train_loss:.3f}")
 
         print_sample(model, tokenizer, device, input_text)
