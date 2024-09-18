@@ -1,5 +1,6 @@
 import tiktoken
 import torch
+from SCons.Tool.sgiar import generate
 
 from gpt import GPT
 from utilities import *
@@ -42,6 +43,8 @@ def main():
 
     # Create tokenizer, encode starter text and build a tensor out of it
     tokenizer = tiktoken.get_encoding("gpt2")
+    # Create AdamW optimizer
+    optimizer = torch.optim.AdamW(model.parameters(), 0.0004, weight_decay=0.1)
 
     ##############################################
     # Load data
@@ -65,6 +68,12 @@ def main():
     validation_loader = create_dataloader(input_text[split_index:], TRAIN_SETTINGS["batch_size"],
                                           GPT_CONFIG["context_length"], GPT_CONFIG["context_length"],
                                           False, False, 0)
+
+    # Test train
+    epochs = 10
+    train_losses, validation_losses, tokens_seen = train_model(
+        model, train_loader, validation_loader, optimizer, device, epochs,
+    5, 5, "Every effort moves you", tokenizer)
 
 
 def train_model(model, train_loader, validation_loader, optimizer, device, epochs,
@@ -91,12 +100,38 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
             tokens_seen += input_batch.numel()
             global_step += 1
 
+            # Evaluation step
             if global_step % eval_freq == 0:
+                # Evaluate the model
                 train_loss, validation_loss = evaluate_model(
                     model, train_loader, validation_loader, device, eval_iter)
-                #######################################
-                # Finish this
-                #######################################
+                # Append all results to lists
+                train_losses.append(train_loss)
+                validation_losses.append(validation_loss)
+                tokens_seen_tracker.append(tokens_seen)
+
+                print(f"Epoch {epoch+1} ({global_step:06d}): "
+                      f"Train loss {train_loss:.3f}, Validation loss: {train_loss:.3f}")
+
+            print_sample(model, tokenizer, device, input_text)
+            return train_losses, validation_losses, tokens_seen_tracker
+
+def print_sample(model, tokenizer, device, input_text):
+    """Generate and print sample"""
+    # Evaluate model, calculate context size and encode the text
+    model.eval()
+    context_size = model.pos_emb.weight.shape[0]
+    encoded = text_to_ids(input_text, tokenizer).to(device)
+
+    # If there isn't gradient existing, generate text
+    with torch.no_grad():
+        # Get token ids, decode them and print the resulting text
+        token_ids = generate_text(model, encoded, 50, context_size)
+        decoded = ids_to_text(token_ids, tokenizer)
+        print(decoded.replace('\n', ' '))
+    # Change back to training mode
+    model.train()
+
 
 
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):

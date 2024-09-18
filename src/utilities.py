@@ -48,3 +48,22 @@ def calc_loss_loader(data_loader, model, device, batches=None):
 
     # Return average loss
     return total_loss / batches
+
+def generate_text(model, indexes, max_tokens, context_size):
+    """Generate text using GPT"""
+    # Go through each token
+    for _ in range(max_tokens):
+        # Get indexes from the previous, up to the current ones
+        index_condition = indexes[:, -context_size]
+
+        # Get predictions
+        with torch.no_grad():
+            logits = model(index_condition)
+        # Focus on the last time step
+        logits = logits[:, -1, :]
+
+        # Get index of the vocab entry with the highest logits
+        index_next = torch.argmax(logits, -1, True)
+        # Update running sequences
+        indexes = torch.cat((indexes, index_next), 1)
+    return indexes
