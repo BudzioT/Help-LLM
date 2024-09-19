@@ -1,6 +1,6 @@
 import tiktoken
 import torch
-import matplotlib.plot as plt
+import matplotlib.pyplot as plt
 
 from gpt import GPT
 from utilities import *
@@ -44,7 +44,8 @@ def main():
     # Create tokenizer, encode starter text and build a tensor out of it
     tokenizer = tiktoken.get_encoding("gpt2")
     # Create AdamW optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), 0.0004, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), TRAIN_SETTINGS["learning_rate"],
+                                  weight_decay=TRAIN_SETTINGS["weight_decay"])
 
     ##############################################
     # Load data
@@ -98,7 +99,7 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
 
         # Go through every batch set in the train loader
         for input_batch, target_batch in train_loader:
-            optimizer.zero_grad() # Reset loss gradient from the previous batch
+            optimizer.zero_grad()  # Reset loss gradient from the previous batch
             loss = calc_loss_batch(input_batch, target_batch, model, device)
             # Calculate loss gradient and update weights using them
             loss.backward()
@@ -118,17 +119,18 @@ def train_model(model, train_loader, validation_loader, optimizer, device, epoch
                 validation_losses.append(validation_loss)
                 tokens_seen_tracker.append(tokens_seen)
 
-                print(f"Epoch {epoch+1} ({global_step:06d}): "
+                print(f"Epoch {epoch + 1} ({global_step:06d}): "
                       f"Train loss {train_loss:.3f}, Validation loss: {train_loss:.3f}")
 
-            print_sample(model, tokenizer, device, input_text)
-            return train_losses, validation_losses, tokens_seen_tracker
+        print_sample(model, tokenizer, device, input_text)
+    return train_losses, validation_losses, tokens_seen_tracker
+
 
 def print_sample(model, tokenizer, device, input_text):
     """Generate and print sample"""
     # Evaluate model, calculate context size and encode the text
     model.eval()
-    context_size = model.pos_emb.weight.shape[0]
+    context_size = model.pos_embedding.weight.shape[0]
     encoded = text_to_ids(input_text, tokenizer).to(device)
 
     # If there isn't gradient existing, generate text
@@ -139,6 +141,7 @@ def print_sample(model, tokenizer, device, input_text):
         print(decoded.replace('\n', ' '))
     # Change back to training mode
     model.train()
+
 
 
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
@@ -152,8 +155,25 @@ def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
 
     return train_loss, validation_loss
 
-def plot_losses(epochs_seen, tokens_seen, train_losses, validation_losses):
-    fig, axis1 =
+
+def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
+    """Plot the losses"""
+    fig, axis1 = plt.subplots()
+
+    # Plot training and validations losses against epochs
+    axis1.plot(epochs_seen, train_losses, label="Training loss")
+    axis1.plot(epochs_seen, val_losses, linestyle="-.", label="Validation loss")
+    axis1.set_xlabel("Epochs")
+    axis1.set_ylabel("Loss")
+    axis1.legend(loc="upper right")
+
+    # Second X-Axis for tokens that were seen
+    axis2 = axis1.twiny()  # Copy first axis
+    axis2.plot(tokens_seen, train_losses, alpha=0)  # Add aligned ticks
+    axis2.set_xlabel("Tokens seen")
+
+    # Adjust layout
+    fig.tight_layout()
 
 
 # Run the main program

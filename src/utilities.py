@@ -14,6 +14,7 @@ def ids_to_text(ids, tokenizer):
     flat_tensor = ids.squeeze(0)
     return tokenizer.decode(flat_tensor.tolist())
 
+
 def calc_loss_batch(input_batch, target_batch, model, device):
     """Calculate cross-entropy loss of the batch"""
     # Get the correct form of batches
@@ -23,6 +24,7 @@ def calc_loss_batch(input_batch, target_batch, model, device):
     logits = model(input_batch)
     loss = torch.nn.functional.cross_entropy(logits.flatten(0, 1), target_batch.flatten())
     return loss
+
 
 def calc_loss_loader(data_loader, model, device, batches=None):
     """Calculate average loss from the data loader"""
@@ -49,12 +51,13 @@ def calc_loss_loader(data_loader, model, device, batches=None):
     # Return average loss
     return total_loss / batches
 
+
 def generate_text(model, indexes, max_tokens, context_size):
     """Generate text using GPT"""
     # Go through each token
     for _ in range(max_tokens):
         # Get indexes from the previous, up to the current ones
-        index_condition = indexes[:, -context_size]
+        index_condition = indexes[:, -context_size:]
 
         # Get predictions
         with torch.no_grad():
