@@ -82,7 +82,13 @@ def main():
     ##############################################
     # Plot results
     epochs_tensor = torch.linspace(0, TRAIN_SETTINGS["epochs"], len(train_losses))
-    plot_losses()
+    plot_losses(epochs_tensor, tokens_seen, train_losses, validation_losses)
+    plt.savefig("loss.pdf")
+
+    # Save and load model
+    torch.save(model.state_dict(), "../resources/model.pth")
+    model = GPT(GPT_CONFIG)
+    model.load_state_dict(torch.load("../resources/model.pth"), True)
 
 
 def train_model(model, train_loader, validation_loader, optimizer, device, epochs,
