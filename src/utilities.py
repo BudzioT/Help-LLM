@@ -70,3 +70,11 @@ def generate_text(model, indexes, max_tokens, context_size):
         # Update running sequences
         indexes = torch.cat((indexes, index_next), 1)
     return indexes
+
+
+def read_text_file(file_path):
+    """Read a text file from the given path"""
+    with open(file_path, 'r', encoding="utf-8") as file:
+        text_data = file.read()
+    return text_data
+

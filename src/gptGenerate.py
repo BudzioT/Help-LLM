@@ -109,6 +109,9 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Update gpt parameters
     gpt = GPT(GPT_CONFIG)
+    # Load model if it already exists
+    if os.path.exists("../resources/model.pth"):
+        gpt.load_state_dict(torch.load("../resources/model.pth"))
     gpt.to(device)
     gpt.eval()
 
@@ -123,3 +126,7 @@ def main():
     token_ids = generate(gpt, text_to_ids(input_text, tokenizer),
                          25, GPT_CONFIG["context_length"], 50, 0.1)
     print("Output text:", ids_to_text(token_ids, tokenizer))
+
+
+if __name__ == "__main__":
+    main()
