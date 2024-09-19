@@ -5,10 +5,11 @@ import urllib.request
 import numpy as np
 import tiktoken
 import torch
-from fsspec.implementations.http import file_size
-from sympy.unify.core import index
 from urllib3 import request
 from tqdm import tqdm
+
+from gpt import GPT
+from utilities import *
 
 
 def download_file(url, destination):
@@ -83,3 +84,42 @@ def generate(model, indexes, max_tokens, context_size,
         indexes = torch.cat((indexes, index_next), 1)
 
     return indexes
+
+
+def main():
+    """Main function of GPT program"""
+    ##############################################
+    # Setup model
+    ##############################################
+    # Configurations for GPT
+    GPT_CONFIG = {
+        "vocab_size": 50257,  # Size based on default tokenizer
+        "context_length": 1024,
+        "embedding_dim": 768,
+        "layers": 12,
+        "heads": 12,
+        "dropout_rate": 0.0,
+        "qkv_bias": True
+    }
+
+    # Torch seed for randomness
+    torch.manual_seed(123)
+
+    # Set the correct device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Update gpt parameters
+    gpt = GPT(GPT_CONFIG)
+    gpt.to(device)
+    gpt.eval()
+
+    # Create tokenizer
+    tokenizer = tiktoken.get_encoding("gpt2")
+
+    ##############################################
+    # Generate text
+    ##############################################
+    input_text = "Every effort moves you"
+
+    token_ids = generate(gpt, text_to_ids(input_text, tokenizer),
+                         25, GPT_CONFIG["context_length"], 50, 0.1)
+    print("Output text:", ids_to_text(token_ids, tokenizer))

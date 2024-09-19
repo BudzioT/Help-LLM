@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fa97a9f-74ec-4d1b-8ee6-5830ac38a5b4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/gptGenerate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gptGenerate.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gptGenerate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gptTrain.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gptTrain.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,6 +80,7 @@
       <workItem from="1726660242629" duration="1971000" />
       <workItem from="1726726582805" duration="1135000" />
       <workItem from="1726733318709" duration="1447000" />
+      <workItem from="1726735836541" duration="949000" />
     </task>
     <servers />
   </component>

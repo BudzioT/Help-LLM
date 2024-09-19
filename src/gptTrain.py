@@ -1,6 +1,6 @@
 import tiktoken
 import torch
-from SCons.Tool.sgiar import generate
+import matplotlib.plot as plt
 
 from gpt import GPT
 from utilities import *
@@ -69,11 +69,19 @@ def main():
                                           GPT_CONFIG["context_length"], GPT_CONFIG["context_length"],
                                           False, False, 0)
 
-    # Test train
-    epochs = 10
+    ##############################################
+    # Train
+    ##############################################
     train_losses, validation_losses, tokens_seen = train_model(
-        model, train_loader, validation_loader, optimizer, device, epochs,
+        model, train_loader, validation_loader, optimizer, device, TRAIN_SETTINGS["epochs"],
     5, 5, "Every effort moves you", tokenizer)
+
+    ##############################################
+    # Plot results and save model weights
+    ##############################################
+    # Plot results
+    epochs_tensor = torch.linspace(0, TRAIN_SETTINGS["epochs"], len(train_losses))
+    plot_losses()
 
 
 def train_model(model, train_loader, validation_loader, optimizer, device, epochs,
@@ -133,7 +141,6 @@ def print_sample(model, tokenizer, device, input_text):
     model.train()
 
 
-
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
     """Evaluate model to training mode"""
     model.eval()
@@ -144,6 +151,10 @@ def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
     model.train()
 
     return train_loss, validation_loss
+
+def plot_losses(epochs_seen, tokens_seen, train_losses, validation_losses):
+    fig, axis1 =
+
 
 # Run the main program
 if __name__ == "__main__":
