@@ -56,7 +56,7 @@ def main():
     # Load data
     ##############################################
     # Load the file
-    file_path = "../resources/the-verdict.txt"
+    file_path = "../resources/data/Self-improving.txt"
     with open(file_path, 'r', encoding="utf-8") as file:
         input_text = file.read()
 
@@ -84,7 +84,8 @@ def main():
 
     train_losses, validation_losses, tokens_seen = train_model(
         model, optimizer, device, TRAIN_SETTINGS["epochs"],
-        5, 5, "Every effort moves you", tokenizer, warmup_steps, 1e-5, 1e-5)
+        5, 5, "Self-care involves taking steps to", tokenizer,
+        warmup_steps, 1e-5, 1e-5)
 
     ##############################################
     # Plot results and save model weights
@@ -225,6 +226,7 @@ def print_sample(model, tokenizer, device, input_text):
 def evaluate_model(model, train_loader, validation_loader, device, eval_iter):
     """Evaluate model to training mode"""
     model.eval()
+
     # If there isn't any gradient, calculate the loss
     with torch.no_grad():
         train_loss = calc_loss_loader(train_loader, model, device, eval_iter)

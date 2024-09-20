@@ -1,3 +1,4 @@
+import math
 import os
 import json
 import urllib.request
@@ -44,9 +45,12 @@ def download_file(url, destination):
 
                     progress_bar.update(len(chunk))
 
-def generate(model, indexes, max_tokens, context_size,
+
+def generate(model, device, indexes, max_tokens, context_size,
              temperature=0.0, top_k=None, eos_id = None):
     """Generate response from GPT"""
+    indexes = indexes.to(device)
+
     # Go through every token
     for _ in range(max_tokens):
         # Get previous responses
@@ -57,9 +61,11 @@ def generate(model, indexes, max_tokens, context_size,
         logits = logits[:, -1, :]  # Focus on the last step
 
         # Filter logits with top_k sampling
-        if top_k is not None:
+        if top_k is not None and top_k > 0:
+            # Ensure that top_k isn't greater than dimension
+            top_k = min(top_k, logits.size(-1))
             # Keep only certain amount of top values
-            top_logits, _ = torch.topk(logits, top_k)
+            top_logits, _ = torch.topk(logits, math.ceil(top_k))
             min_val = top_logits[:, -1]
             logits = torch.where(logits < min_val,
                                  torch.tensor(float("-inf")).to(logits.device), logits)
@@ -98,20 +104,21 @@ def main():
         "embedding_dim": 768,
         "layers": 12,
         "heads": 12,
-        "dropout_rate": 0.0,
-        "qkv_bias": True
+        "dropout_rate": 0.1,
+        "qkv_bias": False
     }
 
     # Torch seed for randomness
-    torch.manual_seed(123)
+    # torch.manual_seed(123)
 
-    # Set the correct device
+    # Choose a correct device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Update gpt parameters
     gpt = GPT(GPT_CONFIG)
     # Load model if it already exists
     if os.path.exists("../resources/model.pth"):
-        gpt.load_state_dict(torch.load("../resources/model.pth"))
+        checkpoint = torch.load("../resources/model.pth", map_location=device, weights_only=True)
+        gpt.load_state_dict(checkpoint)
     gpt.to(device)
     gpt.eval()
 
@@ -123,8 +130,8 @@ def main():
     ##############################################
     input_text = "Every effort moves you"
 
-    token_ids = generate(gpt, text_to_ids(input_text, tokenizer),
-                         25, GPT_CONFIG["context_length"], 50, 0.1)
+    token_ids = generate(gpt, device, text_to_ids(input_text, tokenizer),
+                         25, GPT_CONFIG["context_length"], 1.0, 50)
     print("Output text:", ids_to_text(token_ids, tokenizer))
 
 
