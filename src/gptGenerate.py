@@ -128,7 +128,8 @@ def main():
     ##############################################
     # Generate text
     ##############################################
-    input_text = "Every effort moves you"
+    input_text = "Feeling lonely"
+    # Feeling worthless, Private life is, Maintaining motivation, Feeling lonely
 
     token_ids = generate(gpt, device, text_to_ids(input_text, tokenizer),
                          25, GPT_CONFIG["context_length"], 1.0, 50)

@@ -24,7 +24,7 @@ GPT_CONFIG = {
 # Training settings
 TRAIN_SETTINGS = {
     "learning_rate": 5e-4,
-    "epochs": 10,
+    "epochs": 100,
     "batch_size": 2,
     "weight_decay": 0.1
 }
@@ -43,6 +43,10 @@ def main():
 
     # Model of LLM
     model = GPT(GPT_CONFIG)
+    # Load model
+    if os.path.exists("../resources/model.pth"):
+        checkpoint = torch.load("../resources/model.pth", map_location=device, weights_only=True)
+        model.load_state_dict(checkpoint)
     # Assign model to the used device
     model.to(device)
 
@@ -84,7 +88,7 @@ def main():
 
     train_losses, validation_losses, tokens_seen = train_model(
         model, optimizer, device, TRAIN_SETTINGS["epochs"],
-        5, 5, "Self-care involves taking steps to", tokenizer,
+        5, 5, "Feeling worthless", tokenizer,
         warmup_steps, 1e-5, 1e-5)
 
     ##############################################
