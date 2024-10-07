@@ -72,8 +72,6 @@ It isn't yet written in the best way, it's made for scratch - no pretrained weig
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
 * [![Python][Python-logo]][Python-url]
 * [![PyTorch][Pytorch-logo]][Pytorch-url]
 
